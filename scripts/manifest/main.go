@@ -1,6 +1,7 @@
 package main
 
 import (
+	"alar-corpus/shared"
 	"flag"
 	"fmt"
 	"os"
@@ -8,37 +9,7 @@ import (
 	"strings"
 
 	"github.com/hajimehoshi/go-mp3"
-	"gopkg.in/yaml.v3"
 )
-
-type Entry struct {
-	ID string `yaml:"id"`
-	Head string `yaml:"head"`
-	Word string `yaml:"entry"`
-}
-
-func readYamlDataFile() ([]Entry, error) {
-	var entries []Entry
-	file, err := os.Open("./data/data.yml")
-
-	if err != nil {
-		fmt.Printf("Error opening data file\n")
-		return entries, err
-	}
-
-	defer file.Close()
-	
-	decoder := yaml.NewDecoder(file)
-
-	err = decoder.Decode(&entries)
-
-	if err != nil {
-		fmt.Println("Error reading yaml data file")
-		return entries, err
-	}
-
-	return entries, nil
-}
 
 func getAudioDuration (filePath string) float64 {
 	file, err := os.Open(filePath)
@@ -59,11 +30,13 @@ func getAudioDuration (filePath string) float64 {
 	return duration
 }
 
-func generateManifest(dirPath string, entries* []Entry, files* []string, outFile* os.File) *[]string {
+func generateManifest(dirPath string, entries* []shared.Entry, files* []string, outFile* os.File) {
+	fmt.Printf("Looking for files in dir: %s\n", dirPath)
+
 	dirEntries, err :=	os.ReadDir(dirPath)
 	if err != nil {
 		fmt.Printf("Error reading dir: %v\n", dirPath)
-		return files
+		return
 	}
 
 	for _, dirEntry := range dirEntries {
@@ -79,6 +52,7 @@ func generateManifest(dirPath string, entries* []Entry, files* []string, outFile
 		} else {
 			filePath := fmt.Sprintf("%v/%v", dirPath, dirName)
 			audioId, err := strconv.Atoi(strings.Split(dirName, ".")[0])
+			fmt.Printf("Generating manifest for: %s\n", filePath)
 
 			if err == nil {
 				*files = append(*files, filePath)
@@ -88,8 +62,6 @@ func generateManifest(dirPath string, entries* []Entry, files* []string, outFile
 			}
 		}
 	}
-
-	return files
 }
 
 func main() {
@@ -107,15 +79,17 @@ func main() {
 	csv, err := os.OpenFile(*outFile, os.O_CREATE | os.O_WRONLY | os.O_TRUNC, 0644)
 	if err != nil {
 		fmt.Printf("Error creating out file: %v\n", *outFile)
+		os.Exit(1)
 	}
 
 	csv.WriteString("ID, Head, Word, Duration, File Path\n")
 
-	entries, err := readYamlDataFile()
+	entries, err := shared.ReadYamlDataFile()
 	if err != nil {
 		fmt.Println(err)
-		return
+		os.Exit(1)
 	}
 
 	generateManifest(*dirPath, &entries, &filePaths, csv)
+	fmt.Println("Finished generating manifests for all files!")
 }

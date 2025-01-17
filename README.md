@@ -28,14 +28,14 @@ To generate the dataset yourself, setup gcloud cli as detailed out [here](https:
 cd scripts
 
 # Generating the manifest file
-go run manifest.go
+go run ./manifest.go
 
 # Generate the dataset yourself
 gcloud init
 gcloud auth application-default login
 mkdir data
 curl https://raw.githubusercontent.com/alar-dict/data/refs/heads/master/alar.yml -o data/data.yml
-go run tts.go
+go run ./tts
 ```
 
 ## Audio File Organization
