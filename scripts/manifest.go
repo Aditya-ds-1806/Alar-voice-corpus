@@ -19,10 +19,10 @@ type Entry struct {
 
 func readYamlDataFile() ([]Entry, error) {
 	var entries []Entry
-	file, err := os.Open("./data.yml")
+	file, err := os.Open("./data/data.yml")
 
 	if err != nil {
-		fmt.Printf("Error opening data file")
+		fmt.Printf("Error opening data file\n")
 		return entries, err
 	}
 
@@ -33,7 +33,7 @@ func readYamlDataFile() ([]Entry, error) {
 	err = decoder.Decode(&entries)
 
 	if err != nil {
-		fmt.Printf("Error reading yaml data file")
+		fmt.Println("Error reading yaml data file")
 		return entries, err
 	}
 
@@ -43,14 +43,14 @@ func readYamlDataFile() ([]Entry, error) {
 func getAudioDuration (filePath string) float64 {
 	file, err := os.Open(filePath)
 	if err != nil {
-		fmt.Printf("Error reading file %v", filePath)
+		fmt.Printf("Error reading file %v\n", filePath)
 		return 0
 	}
 	defer file.Close()
 	
 	decoder, err := mp3.NewDecoder(file)
 	if err != nil {
-		fmt.Printf("Error decoding file %v", filePath)
+		fmt.Printf("Error decoding file %v\n", filePath)
 		return 0
 	}
 
@@ -68,6 +68,10 @@ func generateManifest(dirPath string, entries* []Entry, files* []string, outFile
 
 	for _, dirEntry := range dirEntries {
 		dirName := dirEntry.Name()
+
+		if dirName[0] == '.' {
+			continue
+		}
 
 		if dirEntry.IsDir() {
 			newDirPath := fmt.Sprintf("%v/%v", dirPath, dirName)
@@ -90,8 +94,8 @@ func generateManifest(dirPath string, entries* []Entry, files* []string, outFile
 
 func main() {
 	var filePaths []string
-	dirPath := flag.String("dir", "./audio", "Directory path")
-	outFile := flag.String("out", "manifest.csv", "Output file path")
+	dirPath := flag.String("dir", "../audio", "Directory path")
+	outFile := flag.String("out", "../manifest.csv", "Output file path")
 
 	flag.Usage = func() {
 		fmt.Println("Usage: go run manifest.go [options]")
