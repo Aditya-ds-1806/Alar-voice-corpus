@@ -28,6 +28,7 @@ func ReadYamlDataFile() ([]Entry, error) {
 	
 	decoder := yaml.NewDecoder(file)
 
+	// TODO: avoid loading the whole file into memory
 	err = decoder.Decode(&entries)
 
 	if err != nil {
