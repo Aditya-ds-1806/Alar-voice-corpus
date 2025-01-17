@@ -28,7 +28,7 @@ To generate the dataset yourself, setup gcloud cli as detailed out [here](https:
 cd scripts
 
 # Generating the manifest file
-go run ./manifest.go
+go run ./manifest
 
 # Generate the dataset yourself
 gcloud init
@@ -41,3 +41,6 @@ go run ./tts
 ## Audio File Organization
 
 The audio files are grouped into folders based on their ID ranges, with each folder containing files named after their unique numeric ID. For example, `audio/1-9999/1234.mp3` contains the audio file for `ID 1234`, and `10000-19999/15000.mp3` contains the audio file for `ID 15000`. Each folder covers a range of 10,000 IDs.
+
+## License
+GNU General Public License v2.0
